@@ -13,16 +13,15 @@ namespace SecretSanta
         public int? SignificantOtherID { get; set; }
         public int? RecipientID { get; set; }
 
-        public Person(int id, string name, int? significantOtherId)
+        public Person(int id, string name)
         {
             ID = id;
             Name = name;
-            SignificantOtherID = significantOtherId;
         }
 
         public override string ToString()
         {
-            return $"ID: {ID}\nName: {Name}\nSignificant Other ID: {SignificantOtherID}";
+            return $"ID: {ID}\tName: {Name}\tRecipient ID: {RecipientID}";
         }
     }
 }
