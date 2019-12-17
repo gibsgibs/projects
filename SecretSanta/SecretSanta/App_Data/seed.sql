@@ -1,39 +1,31 @@
-﻿INSERT INTO [dbo].[Person] (Name) VALUES
-	('Josh'),
-	('Jenessa'),
-	('Miceala'),
-	('Iain'),
-	('Megan'),
-	('Jacob'),
-	('Zach'),
-	('Desi'),
-	('Tyler'),
-	('Gabe'),
-	('Ami'),
-	('Dylan'),
-	('Elijah'),
-	('Mariah'),
-	('Isabelle'),
-	('Benjamin')
-GO
+﻿CREATE TABLE [dbo].[BulkData]
+(
+	[Name]					NVARCHAR(50),
+	[SignificantOtherName]	NVARCHAR(50)
+);
 
-INSERT INTO [dbo].[Relationship] (Person1, Person2)
-	SELECT p1.PersonID, p2.PersonID
-	FROM dbo.Person AS p1, dbo.Person AS p2
-	WHERE p1.Name = 'Josh' AND p2.Name = 'Jenessa';
-INSERT INTO [dbo].[Relationship] (Person1, Person2)
-	SELECT p1.PersonID, p2.PersonID
-	FROM dbo.Person AS p1, dbo.Person AS p2
-	WHERE p1.Name = 'Miceala' AND p2.Name = 'Iain';
-INSERT INTO [dbo].[Relationship] (Person1, Person2)
-	SELECT p1.PersonID, p2.PersonID
-	FROM dbo.Person AS p1, dbo.Person AS p2
-	WHERE p1.Name = 'Megan' AND p2.Name = 'Jacob';
-INSERT INTO [dbo].[Relationship] (Person1, Person2)
-	SELECT p1.PersonID, p2.PersonID
-	FROM dbo.Person AS p1, dbo.Person AS p2
-	WHERE p1.Name = 'Zach' AND p2.Name = 'Desi';
-INSERT INTO [dbo].[Relationship] (Person1, Person2)
-	SELECT p1.PersonID, p2.PersonID
-	FROM dbo.Person AS p1, dbo.Person AS p2
-	WHERE p1.Name = 'Gabe' AND p2.Name = 'Ami';
+BULK INSERT [dbo].[BulkData]
+	FROM 'C:\Users\GBreh\Desktop\projects\people.csv'
+	WITH
+	(
+		FIELDTERMINATOR = ',',
+		ROWTERMINATOR = '\n',
+		FIRSTROW = 2
+	);
+
+INSERT INTO [dbo].[Person] ([Name])
+	SELECT Name 
+	FROM [dbo].[BulkData];
+
+INSERT INTO [dbo].[Relationship] ([Person1], [Person2])
+	SELECT DISTINCT p1.PersonID, p2.PersonID
+	FROM [dbo].[Person] AS p1 
+	JOIN [dbo].[Person] AS p2
+	ON p1.PersonID != p2.PersonID
+	JOIN [dbo].[BulkData] as bd
+	ON p1.Name = bd.Name
+	WHERE bd.SignificantOtherName = p2.Name;
+	
+
+
+DROP TABLE [dbo].[BulkData]

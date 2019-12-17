@@ -10,6 +10,8 @@ namespace SecretSanta
     {
         static void Main(string[] args)
         {
+
+
             Random random = new Random();
             List<int> recipients = new List<int>();
             List<Person> people = new List<Person>();
