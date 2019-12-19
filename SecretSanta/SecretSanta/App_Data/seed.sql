@@ -1,7 +1,8 @@
 ﻿CREATE TABLE [dbo].[BulkData]
 (
 	[Name]					NVARCHAR(50),
-	[SignificantOtherName]	NVARCHAR(50)
+	[SignificantOtherName]	NVARCHAR(50),
+	[Email]					NVARCHAR(350)
 );
 
 BULK INSERT [dbo].[BulkData]
@@ -13,19 +14,15 @@ BULK INSERT [dbo].[BulkData]
 		FIRSTROW = 2
 	);
 
-INSERT INTO [dbo].[Person] ([Name])
-	SELECT Name 
+INSERT INTO [dbo].[Person] ([Name], [Email])
+	SELECT Name, Email
 	FROM [dbo].[BulkData];
 
-INSERT INTO [dbo].[Relationship] ([Person1], [Person2])
-	SELECT DISTINCT p1.PersonID, p2.PersonID
-	FROM [dbo].[Person] AS p1 
-	JOIN [dbo].[Person] AS p2
-	ON p1.PersonID != p2.PersonID
-	JOIN [dbo].[BulkData] as bd
-	ON p1.Name = bd.Name
-	WHERE bd.SignificantOtherName = p2.Name;
-	
+UPDATE [dbo].[Person] SET SignificantOther = 
+(
+	SELECT p.PersonID FROM [dbo].[Person] AS p
+	JOIN [dbo].[BulkData] as bd ON p.Name = bd.Name
+	WHERE bd.SignificantOtherName = p.Name
+)
 
-
-DROP TABLE [dbo].[BulkData]
+DROP TABLE [dbo].[BulkData];
