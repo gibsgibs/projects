@@ -18,11 +18,15 @@ INSERT INTO [dbo].[Person] ([Name], [Email])
 	SELECT Name, Email
 	FROM [dbo].[BulkData];
 
-UPDATE [dbo].[Person] SET SignificantOther = 
-(
-	SELECT p.PersonID FROM [dbo].[Person] AS p
-	JOIN [dbo].[BulkData] as bd ON p.Name = bd.Name
-	WHERE bd.SignificantOtherName = p.Name
-)
+INSERT INTO [dbo].[Relationship] ([Person1], [Person2])
+	SELECT DISTINCT p1.PersonID, p2.PersonID
+	FROM [dbo].[Person] AS p1 
+	JOIN [dbo].[Person] AS p2
+	ON p1.PersonID != p2.PersonID
+	JOIN [dbo].[BulkData] as bd
+	ON p1.Name = bd.Name
+	WHERE bd.SignificantOtherName = p2.Name;
+
+DELETE FROM [dbo].[Relationship] WHERE Person1 > Person2;
 
 DROP TABLE [dbo].[BulkData];
